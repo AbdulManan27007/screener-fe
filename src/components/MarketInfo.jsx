@@ -149,7 +149,7 @@ const MarketSidebar = ({ token }) => {
 
   const create = async (values) => {
     try {
-      await axios.post(`${API_URL}/transactions`, values, {
+      await axios.post(`${API_URL}/api/transactions`, values, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
           'Content-Type': 'application/json',
