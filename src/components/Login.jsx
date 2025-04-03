@@ -1,27 +1,27 @@
-import React, { useState } from "react";
-import { Button, Input, Row, Col, Typography, Card } from "antd";
-import { UserOutlined, LockOutlined } from "@ant-design/icons";
-import logo from "../assets/icon.jpeg";
-import { useNavigate } from "react-router-dom";
-import "animate.css";
-import axios from "axios";
+import React, { useState } from 'react';
+import { Button, Input, Row, Col, Typography, Card } from 'antd';
+import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import logo from '../assets/icon.jpeg';
+import { useNavigate } from 'react-router-dom';
+import 'animate.css';
+import axios from 'axios';
 
 const { Paragraph } = Typography;
 
 function Login() {
   const navigate = useNavigate();
-  const [password, setPassword] = useState("");
-  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
 
   const validateForm = () => {
     if (!email || !password) {
-      alert("Please enter both email and password.");
+      alert('Please enter both email and password.');
       return false;
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      alert("Please enter a valid email address.");
+      alert('Please enter a valid email address.');
       return false;
     }
     return true;
@@ -46,20 +46,20 @@ function Login() {
       const data = response.data;
 
       if (response.status === 201 || response.status === 200) {
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("role", data.user.role);
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('role', data.user.role);
 
-        alert("Login successful!");
-        if (data.user.role === "admin") {
-          navigate("/admin");
+        alert('Login successful!');
+        if (data.user.role === 'admin') {
+          navigate('/admin');
         } else {
-          navigate("/");
+          navigate('/Home');
         }
       }
     } catch (error) {
-      console.error("Error during login:", error);
+      console.error('Error during login:', error);
       alert(
-        error?.response?.data?.error || "An error occurred. Please try again."
+        error?.response?.data?.error || 'An error occurred. Please try again.'
       );
     } finally {
       setLoading(false);
@@ -72,7 +72,7 @@ function Login() {
         <Col>
           <Card
             className="p-8 rounded-lg shadow-lg !bg-transparent bg-opacity-80"
-            style={{ backdropFilter: "blur(10px)" }}
+            style={{ backdropFilter: 'blur(10px)' }}
           >
             <div className="text-center flex flex-col items-center animate__animated animate__fadeIn">
               <img
@@ -123,12 +123,12 @@ function Login() {
               <Button
                 type="default"
                 className="mx-2"
-                onClick={() => navigate("/signup")}
+                onClick={() => navigate('/signup')}
                 size="large"
                 style={{
-                  background: "linear-gradient(45deg, #ff6ec7, #7851a9)",
-                  borderColor: "transparent",
-                  color: "#fff",
+                  background: 'linear-gradient(45deg, #ff6ec7, #7851a9)',
+                  borderColor: 'transparent',
+                  color: '#fff',
                 }}
               >
                 Sign Up

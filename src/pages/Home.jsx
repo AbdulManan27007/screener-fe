@@ -9,6 +9,13 @@ const Home = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/login');
+    }
+  }, [navigate]);
+
+  useEffect(() => {
     const getMarketData = async () => {
       setLoading(true);
       try {
