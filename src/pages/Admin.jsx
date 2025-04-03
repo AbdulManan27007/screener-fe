@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import {
   Layout,
   Table,
@@ -15,13 +15,13 @@ import {
   Card,
   Col,
   Upload,
-} from "antd";
-import { LogoutOutlined, UploadOutlined } from "@ant-design/icons";
-import Login from "../components/Login";
-import { useNavigate } from "react-router-dom";
+} from 'antd';
+import { LogoutOutlined, UploadOutlined } from '@ant-design/icons';
+import Login from '../components/Login';
+import { useNavigate } from 'react-router-dom';
 
 const { Content } = Layout;
-const API_URL = "http://localhost:8000/api";
+const API_URL =     `${import.meta.env.VITE_API_URL}/api` // Corrected URL
 
 export default function Admin() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -30,20 +30,20 @@ export default function Admin() {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
-  const [modalType, setModalType] = useState("");
+  const [modalType, setModalType] = useState('');
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState([]);
-  const [logoUrl, setLogoUrl] = useState("");
+  const [logoUrl, setLogoUrl] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem('token');
     if (token) {
       axios
         .get(`${API_URL}/me`, { headers: { Authorization: `Bearer ${token}` } })
         .then((response) => {
           setIsLoggedIn(true);
-          setIsAdmin(response.data.role === "admin");
+          setIsAdmin(response.data.role === 'admin');
         })
         .catch(() => setIsLoggedIn(false))
         .finally(() => setLoading(false));
@@ -55,50 +55,50 @@ export default function Admin() {
     setLoading(true);
     axios
       .get(`${API_URL}/tokens`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       })
       .then((response) => setTokens(response.data))
       .catch(() => {
-        notification.error({ message: "Failed to load tokens." });
+        notification.error({ message: 'Failed to load tokens.' });
       });
     axios
       .get(`${API_URL}/transactions`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       })
       .then((response) => setTransactions(response.data))
       .catch(() => {
-        notification.error({ message: "Failed to load transactions." });
+        notification.error({ message: 'Failed to load transactions.' });
       })
       .finally(() => setLoading(false));
   };
   useEffect(() => {
     if (isAdmin) {
-     fetch();
+      fetch();
     }
   }, [isAdmin]);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    localStorage.removeItem('token');
     setIsLoggedIn(false);
-    navigate("/login");
+    navigate('/login');
   };
 
   const handleDelete = async (type, id) => {
     try {
       await axios.delete(`${API_URL}/${type}/${id}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       });
-      if (type === "tokens") {
+      if (type === 'tokens') {
         setTokens(tokens.filter((token) => token._id !== id));
       } else {
         setTransactions(
           transactions.filter((transaction) => transaction._id !== id)
         );
       }
-      fetch()
+      fetch();
     } catch (error) {
-      notification.error({ message: "Error deleting item." });
-      console.error("Error deleting:", error);
+      notification.error({ message: 'Error deleting item.' });
+      console.error('Error deleting:', error);
     }
   };
 
@@ -110,10 +110,10 @@ export default function Admin() {
         }`,
         values,
         {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
         }
       );
-      if (type === "tokens") {
+      if (type === 'tokens') {
         setTokens(
           tokens.filter((token) => token.pairAddress !== values.pairAddress)
         );
@@ -127,16 +127,16 @@ export default function Admin() {
       notification.success({ message: `${type} updated successfully.` });
     } catch (error) {
       notification.error({ message: `Error updating ${type}.` });
-      console.error("Error updating:", error);
+      console.error('Error updating:', error);
     }
   };
 
   const create = async (type, values) => {
     try {
       const resp = await axios.post(`${API_URL}/${type}`, values, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       });
-      if (type === "tokens") {
+      if (type === 'tokens') {
         setTokens([...tokens, resp.data]);
       } else {
         setTransactions([...transactions, resp.data]);
@@ -144,9 +144,11 @@ export default function Admin() {
       notification.success({ message: `${type} created successfully.` });
     } catch (error) {
       notification.error({ message: `Error creating ${type}.` });
-      console.error("Error creating:", error);
+      console.error('Error creating:', error);
     }
   };
+
+  console.log('Tokens:', tokens.pairAddress);
 
   const handleEdit = async (type, record) => {
     setModalType(type);
@@ -174,33 +176,33 @@ export default function Admin() {
       setModalVisible(false);
     } catch (error) {
       notification.error({
-        message: "Validation failed. Please check the inputs.",
+        message: 'Validation failed. Please check the inputs.',
       });
-      console.error("Validation Failed:", error);
+      console.error('Validation Failed:', error);
     }
   };
   const handleImageUpload = async (file) => {
     const formData = new FormData();
-    formData.append("image", file);
+    formData.append('image', file);
 
     try {
       const response = await axios.post(
-        "http://localhost:8000/api/upload",
+        `${import.meta.env.VITE_API_URL}/api/upload`, // Corrected URL
         formData,
         {
           headers: {
-            "Content-Type": "multipart/form-data",
+            'Content-Type': 'multipart/form-data',
           },
         }
       );
 
       if (response.status === 200) {
         setLogoUrl(response.data.files[0].url);
-        alert("Logo uploaded successfully!");
+        alert('Logo uploaded successfully!');
       }
     } catch (error) {
-      alert("Error uploading logo!");
-      console.error("Error During Signup", error);
+      alert('Error uploading logo!');
+      console.error('Error During Signup', error);
     }
   };
   const handleFileChange = ({ fileList }) => {
@@ -220,37 +222,37 @@ export default function Admin() {
 
   const columnsTokens = [
     {
-      title: "Logo",
-      dataIndex: "logo",
-      key: "logo",
+      title: 'Logo',
+      dataIndex: 'logo',
+      key: 'logo',
       render: (text) => <img src={text} alt="Logo" className="w-10" />,
     },
-    { 
-      title: "Pair Address", 
-      dataIndex: "pairAddress", 
-      key: "pairAddress",
+    {
+      title: 'Pair Address',
+      dataIndex: 'pairAddress',
+      key: 'pairAddress',
       render: (text) => (
-        <a 
-          href={`https://etherscan.io/address/${text}`} 
-          target="_blank" 
+        <a
+          href={`https://etherscan.io/address/${text}`}
+          target="_blank"
           rel="noopener noreferrer"
           className="text-blue-500 hover:underline"
         >
           {text}
         </a>
-      )
+      ),
     },
-    { title: "Price USD", dataIndex: "priceUSD", key: "priceUSD" },
-    { title: "Liquidity", dataIndex: "liquidity", key: "liquidity" },
+    { title: 'Price USD', dataIndex: 'priceUSD', key: 'priceUSD' },
+    { title: 'Liquidity', dataIndex: 'liquidity', key: 'liquidity' },
     {
-      title: "Action",
-      key: "action",
+      title: 'Action',
+      key: 'action',
       render: (_, record) => (
         <div className="!w-[20px] flex">
-          <Button onClick={() => handleEdit("tokens", record)}>Edit</Button>
+          <Button onClick={() => handleEdit('tokens', record)}>Edit</Button>
           <Popconfirm
             title="Are you sure?"
-            onConfirm={() => handleDelete("tokens", record.pairAddress)}
+            onConfirm={() => handleDelete('tokens', record.pairAddress)}
           >
             <Button className="!border !border-gray-600 ml-2" type="danger">
               Delete
@@ -263,13 +265,13 @@ export default function Admin() {
 
   const columnsTransactions = [
     {
-      title: "Pair Address",
-      dataIndex: "pairAddress",
-      key: "pairAddress",
+      title: 'Pair Address',
+      dataIndex: 'pairAddress',
+      key: 'pairAddress',
       render: (_, record) => (
-        <a 
-          href={`https://etherscan.io/address/${record.tokenId?.pairAddress}`} 
-          target="_blank" 
+        <a
+          href={`https://etherscan.io/address/${record.tokenId?.pairAddress}`}
+          target="_blank"
           rel="noopener noreferrer"
           className="text-blue-500 hover:underline"
         >
@@ -277,17 +279,17 @@ export default function Admin() {
         </a>
       ),
     },
-    { title: "Transaction Type", dataIndex: "type", key: "type" },
-    { title: "Volume", dataIndex: "volume", key: "volume" },
-    { title: "Price (USD)", dataIndex: "priceUSD", key: "priceUSD" },
+    { title: 'Transaction Type', dataIndex: 'type', key: 'type' },
+    { title: 'Volume', dataIndex: 'volume', key: 'volume' },
+    { title: 'Price (USD)', dataIndex: 'priceUSD', key: 'priceUSD' },
     {
-      title: "Action",
-      key: "action",
+      title: 'Action',
+      key: 'action',
       render: (_, record) => (
         <div>
           <Popconfirm
             title="Are you sure?"
-            onConfirm={() => handleDelete("transactions", record._id)}
+            onConfirm={() => handleDelete('transactions', record._id)}
           >
             <Button className="!border !border-gray-600" type="danger">
               Delete
@@ -308,15 +310,15 @@ export default function Admin() {
   if (!isLoggedIn) return <Login />;
   if (!isAdmin) {
     localStorage.clear();
-    navigate("/login");
+    navigate('/login');
   }
 
   return (
-    <Layout style={{ minHeight: "100vh" }}>
-      <Content style={{ padding: "0 24px", minHeight: 280 }}>
+    <Layout style={{ minHeight: '100vh' }}>
+      <Content style={{ padding: '0 24px', minHeight: 280 }}>
         <Tabs defaultActiveKey="1">
           <Tabs.TabPane tab="Tokens" key="1">
-            <Button className="mb-2" onClick={() => handleCreate("tokens")}>
+            <Button className="mb-2" onClick={() => handleCreate('tokens')}>
               Create Token
             </Button>
             <Table dataSource={tokens} columns={columnsTokens} rowKey="_id" />
@@ -324,7 +326,7 @@ export default function Admin() {
           <Tabs.TabPane tab="Transactions" key="2">
             <Button
               className="mb-2"
-              onClick={() => handleCreate("transactions")}
+              onClick={() => handleCreate('transactions')}
             >
               Create Transaction
             </Button>
@@ -344,14 +346,14 @@ export default function Admin() {
         Logout
       </Button>
       <Modal
-        title={modalType === "tokens" ? "Token Details" : "Transaction Details"}
+        title={modalType === 'tokens' ? 'Token Details' : 'Transaction Details'}
         open={modalVisible}
         centered
         width={1000}
         onOk={() => handleSave(modalType)}
         onCancel={() => setModalVisible(false)}
       >
-        {modalType === "tokens" ? (
+        {modalType === 'tokens' ? (
           <Form form={form} layout="vertical">
             <Form.Item className="hidden" name="_id" label="_id">
               <Input />
@@ -380,7 +382,7 @@ export default function Admin() {
                 className="w-full"
                 rules={[
                   { required: true, message: 'Please input the pair address!' },
-                  { validator: validateEthereumAddress }
+                  { validator: validateEthereumAddress },
                 ]}
               >
                 <Input placeholder="0x..." />
@@ -503,7 +505,7 @@ export default function Admin() {
             <div className="font-bold text-lg mb-2"> Mint A</div>
             <Col className="flex w-full gap-4">
               <Form.Item
-                name={["mintA", "address"]}
+                name={['mintA', 'address']}
                 className="w-full"
                 label="Mint A Address"
                 rules={[{ required: true }]}
@@ -513,7 +515,7 @@ export default function Admin() {
 
               <Form.Item
                 className="w-full"
-                name={["mintA", "name"]}
+                name={['mintA', 'name']}
                 label="Mint A Name"
                 rules={[{ required: true }]}
               >
@@ -527,7 +529,7 @@ export default function Admin() {
                 <Input />
               </Form.Item> */}
               <Form.Item
-                name={["mintA", "price"]}
+                name={['mintA', 'price']}
                 className="w-full"
                 label="Mint A Price"
                 rules={[{ required: true }]}
@@ -536,7 +538,7 @@ export default function Admin() {
               </Form.Item>
 
               <Form.Item
-                name={["mintA", "pool"]}
+                name={['mintA', 'pool']}
                 className="w-full"
                 label="Mint A Pool"
                 rules={[{ required: true }]}
@@ -547,14 +549,14 @@ export default function Admin() {
             <div className="font-bold text-lg mb-2"> Mint B</div>
             <Col className="flex w-full gap-4">
               <Form.Item
-                name={["mintB", "address"]}
+                name={['mintB', 'address']}
                 className="w-full"
                 label="Mint B Address"
               >
                 <Input />
               </Form.Item>
               <Form.Item
-                name={["mintB", "name"]}
+                name={['mintB', 'name']}
                 className="w-full"
                 label="Mint B Name"
               >
@@ -568,7 +570,7 @@ export default function Admin() {
                 <Input />
               </Form.Item> */}
               <Form.Item
-                name={["mintB", "price"]}
+                name={['mintB', 'price']}
                 className="w-full"
                 label="Mint B Price"
               >
@@ -576,7 +578,7 @@ export default function Admin() {
               </Form.Item>
 
               <Form.Item
-                name={["mintB", "pool"]}
+                name={['mintB', 'pool']}
                 className="w-full"
                 label="Mint B Pool"
               >
@@ -586,7 +588,7 @@ export default function Admin() {
             <div className="font-bold text-lg mb-2"> Price</div>
             <Col className="flex w-full gap-4">
               <Form.Item
-                name={["bought", "priceUSD"]}
+                name={['bought', 'priceUSD']}
                 className="w-full"
                 label="Bought Price USD"
               >
@@ -594,7 +596,7 @@ export default function Admin() {
               </Form.Item>
 
               <Form.Item
-                name={["bought", "volume"]}
+                name={['bought', 'volume']}
                 className="w-full"
                 label="Bought Volume"
               >
@@ -602,7 +604,7 @@ export default function Admin() {
               </Form.Item>
 
               <Form.Item
-                name={["bought", "txns"]}
+                name={['bought', 'txns']}
                 className="w-full"
                 label="Bought Transactions"
               >
@@ -612,7 +614,7 @@ export default function Admin() {
 
             <Col className="flex w-full gap-4">
               <Form.Item
-                name={["sold", "priceUSD"]}
+                name={['sold', 'priceUSD']}
                 className="w-full"
                 label="Sold Price USD"
               >
@@ -620,7 +622,7 @@ export default function Admin() {
               </Form.Item>
 
               <Form.Item
-                name={["sold", "volume"]}
+                name={['sold', 'volume']}
                 className="w-full"
                 label="Sold Volume"
               >
@@ -628,7 +630,7 @@ export default function Admin() {
               </Form.Item>
 
               <Form.Item
-                name={["sold", "txns"]}
+                name={['sold', 'txns']}
                 className="w-full"
                 label="Sold Transactions"
               >
@@ -652,19 +654,31 @@ export default function Admin() {
                 <Input type="number" />
               </Form.Item>
             </Col>
-            </Form>
+          </Form>
         ) : (
           <Form form={form} layout="vertical">
-            <Form.Item name="_id" label="_id" className="hidden">
-              <Input />
-            </Form.Item>
             <Form.Item
               name="tokenId"
-              label="Token ID"
+              label="Token Pair Address"
               className="w-full"
-              rules={[{ required: true, message: "Token ID is required" }]}
+              rules={[
+                { required: true, message: 'Token Pair Address is required' },
+              ]}
             >
-              <Input />
+              <Select
+                showSearch
+                optionFilterProp="children"
+                filterOption={(input, option) =>
+                  option.children.toLowerCase().indexOf(input.toLowerCase()) >=
+                  0
+                }
+              >
+                {tokens.map((token) => (
+                  <Select.Option key={token._id} value={token._id}>
+                    {token.pairAddress}
+                  </Select.Option>
+                ))}
+              </Select>
             </Form.Item>
 
             <Col className="flex w-full gap-4">
@@ -672,27 +686,27 @@ export default function Admin() {
                 name="type"
                 className="w-full"
                 label="Type"
-                rules={[{ required: true, message: "Type is required" }]}
+                rules={[{ required: true, message: 'Type is required' }]}
               >
                 <Select>
                   <Select.Option value="buy">Buy</Select.Option>
                   <Select.Option value="sell">Sell</Select.Option>
                 </Select>
               </Form.Item>
-
               <Form.Item
                 name="volume"
                 label="Volume"
                 className="w-full"
-                rules={[{ required: true, message: "Volume is required" }]}
+                rules={[{ required: true, message: 'Volume is required' }]}
               >
                 <Input type="number" />
-              </Form.Item>``
+              </Form.Item>
+              ``
               <Form.Item
                 name="priceUSD"
                 className="w-full"
                 label="Price USD"
-                rules={[{ required: true, message: "Price USD is required" }]}
+                rules={[{ required: true, message: 'Price USD is required' }]}
               >
                 <Input type="number" />
               </Form.Item>
@@ -703,7 +717,7 @@ export default function Admin() {
                 name="priceSOL"
                 label="Price SOL"
                 className="w-full"
-                rules={[{ required: true, message: "Price SOL is required" }]}
+                rules={[{ required: true, message: 'Price SOL is required' }]}
               >
                 <Input type="number" />
               </Form.Item>

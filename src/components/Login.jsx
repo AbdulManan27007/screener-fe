@@ -40,7 +40,7 @@ function Login() {
     try {
       setLoading(true);
       const response = await axios.post(
-        "http://localhost:8000/api/login",
+        `${import.meta.env.VITE_API_URL}/api/login`, // Corrected URL
         user
       );
       const data = response.data;

@@ -34,7 +34,7 @@ import { PowerIcon, ProgressIcon, EyesIcon } from '../assets/icons/Icons';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 
-const API_URL = 'http://localhost:8000/api';
+const API_URL = import.meta.env.VITE_API_URL; // Replace with your API URL
 
 // Candle generation function
 

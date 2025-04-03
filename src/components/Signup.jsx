@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   Button,
   Input,
@@ -8,30 +8,31 @@ import {
   Card,
   Switch,
   Upload,
-} from "antd";
+} from 'antd';
 import {
   UserOutlined,
   LockOutlined,
   MailOutlined,
   UploadOutlined,
-} from "@ant-design/icons";
+} from '@ant-design/icons';
 
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import logo from "../assets/icon.jpeg";
-import "animate.css";
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import logo from '../assets/icon.jpeg';
+import 'animate.css';
 
 const { Paragraph } = Typography;
 
 function Signup() {
   const navigate = useNavigate();
 
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [fileList, setFileList] = useState([]);
-  const [logoUrl, setLogoUrl] = useState("");
+  const [logoUrl, setLogoUrl] = useState('');
 
   const handleFileChange = ({ fileList }) => {
     setFileList(fileList);
@@ -39,26 +40,26 @@ function Signup() {
 
   const handleImageUpload = async (file) => {
     const formData = new FormData();
-    formData.append("image", file);
+    formData.append('image', file);
 
     try {
       const response = await axios.post(
-        "http://localhost:8000/api/upload",
+        `${import.meta.env.VITE_API_URL}/api/upload`,
         formData,
         {
           headers: {
-            "Content-Type": "multipart/form-data",
+            'Content-Type': 'multipart/form-data',
           },
         }
       );
 
       if (response.status === 200) {
         setLogoUrl(response.data.files[0].url);
-        alert("Logo uploaded successfully!");
+        alert('Logo uploaded successfully!');
       }
     } catch (error) {
-      alert("Error uploading logo!");
-      console.error("Error During Signup", error);
+      alert('Error uploading logo!');
+      console.error('Error During Signup', error);
     }
   };
 
@@ -67,12 +68,12 @@ function Signup() {
     const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
     if (!passwordRegex.test(password)) {
       alert(
-        "Password must be at least 8 characters long and contain both letters and numbers."
+        'Password must be at least 8 characters long and contain both letters and numbers.'
       );
       return;
     }
     if (password !== confirmPassword && password.length) {
-      alert("Passwords do not match!");
+      alert('Passwords do not match!');
       return;
     }
 
@@ -80,31 +81,31 @@ function Signup() {
       username,
       email,
       password,
-      // role: isAdmin ? "admin" : "user",
+      role: isAdmin ? 'admin' : 'user',
       logo: logoUrl,
     };
 
     try {
       const response = await axios.post(
-        "http://localhost:8000/api/register",
+        `${import.meta.env.VITE_API_URL}/api/register`, // Corrected URL
         newUser
       );
 
       const data = response.data;
 
       if (response.status === 201 || response.status === 200) {
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("role", data.user.role);
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('role', data.user.role);
 
-        alert("Signup successful!");
-        if (data.user.role === "admin") {
-          navigate("/admin");
+        alert('Signup successful!');
+        if (data.user.role === 'admin') {
+          navigate('/admin');
         } else {
-          navigate("/");
+          navigate('/');
         }
       }
     } catch (error) {
-      console.error("Error during signup:", error);
+      console.error('Error during signup:', error);
       alert(error?.response?.data?.error);
     }
   };
@@ -115,7 +116,7 @@ function Signup() {
         <Col>
           <Card
             className="p-8 rounded-lg shadow-lg !bg-transparent bg-opacity-80"
-            style={{ backdropFilter: "blur(10px)" }}
+            style={{ backdropFilter: 'blur(10px)' }}
           >
             <div className="text-center flex flex-col items-center animate__animated animate__fadeIn">
               <img
@@ -168,7 +169,7 @@ function Signup() {
                 onChange={(e) => setConfirmPassword(e.target.value)}
               />
 
-              {/* <div className="mb-4 flex gap-4">
+              <div className="mb-4 flex gap-4">
                 <Paragraph className="!text-gray-200">Select Role:</Paragraph>
                 <Switch
                   checked={isAdmin}
@@ -176,11 +177,14 @@ function Signup() {
                   checkedChildren="Admin"
                   unCheckedChildren="User"
                 />
-              </div> */}
+              </div>
 
               <div className="mb-4">
                 <Upload
-                  beforeUpload={handleImageUpload}
+                  beforeUpload={(file) => {
+                    handleImageUpload(file);
+                    return false;
+                  }}
                   fileList={fileList}
                   onChange={handleFileChange}
                   showUploadList={false}
@@ -210,12 +214,12 @@ function Signup() {
               <Button
                 type="default"
                 className="mx-2"
-                onClick={() => navigate("/login")}
+                onClick={() => navigate('/login')}
                 size="large"
                 style={{
-                  background: "linear-gradient(45deg, #ff6ec7, #7851a9)",
-                  borderColor: "transparent",
-                  color: "#fff",
+                  background: 'linear-gradient(45deg, #ff6ec7, #7851a9)',
+                  borderColor: 'transparent',
+                  color: '#fff',
                 }}
               >
                 Login
