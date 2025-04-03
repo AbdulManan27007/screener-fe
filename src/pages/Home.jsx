@@ -15,20 +15,28 @@ const Home = () => {
     }
   }, [navigate]);
 
+  const getMarketData = async () => {
+    setLoading(true);
+    try {
+      const data = await fetchTokens();
+      setTokens(data);
+    } catch (error) {
+      console.error('Error fetching market data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const getMarketData = async () => {
-      setLoading(true);
-      try {
-        const data = await fetchTokens();
-        setTokens(data);
-      } catch (error) {
-        console.error('Error fetching market data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+    const token = localStorage.getItem('token');
+    if (!token) return; // Prevent API call if user is not authenticated
     getMarketData();
   }, []);
+
+  // If the token is missing, prevent rendering the component
+  if (!localStorage.getItem('token')) {
+    return null;
+  }
 
   const columns = [
     {
