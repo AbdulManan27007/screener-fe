@@ -49,11 +49,9 @@ const TradingChart = () => {
   return (
     <div className="flex h-screen overflow-hidden text-black">
       <div className="flex-1 flex flex-col">
-      {/* Pass the mapped symbol to the TradingViewWidget */}
-      <div className="h-[50vh]">
+        {/* Pass transactions to TradingViewWidget */}
         <ChartExample  />
-      </div>
-        <div className="overflow-y-auto h-[50vh]">
+        <div className="overflow-y-auto max-h-[48vh]">
           <TabbedTables />
         </div>
       </div>

@@ -107,13 +107,13 @@ const TabbedTables = () => {
   ];
 
   return (
-    <div className="tabbed-tables-container ">
+    <div className="tabbed-tables-container">
       <Tabs
         defaultActiveKey="1"
-        className="custom-tabs "
+        className="custom-tabs"
         tabBarStyle={{
-          background: "#1d1d22",
-          borderBottom: "1px solid #374151",
+          background: '#1d1d22',
+          borderBottom: '1px solid #374151',
         }}
         onChange={handleTabChange}
         items={tabData.map((tab) => ({

@@ -54,40 +54,30 @@ const MarketSidebar = ({ token }) => {
     const randomIndex = Math.floor(Math.random() * marketData.length);
     return marketData[randomIndex];
   });
-
   function generateCandle(basePrice) {
-    let fluctuation = basePrice * 0.05; // 5% fluctuation range
-    const isBearish = Math.random() < 0.6; // 60% chance of a bearish candle
-
-    let open = (
-      basePrice +
-      (Math.random() * fluctuation - fluctuation / 2)
-    ).toFixed(2);
-    let high, low, close;
-
-    if (isBearish) {
-      // Bearish scenario: close lower than open
-      high = (parseFloat(open) + Math.random() * (fluctuation * 2)).toFixed(2); // Increased range
-      low = (parseFloat(high) - Math.random() * (fluctuation * 2)).toFixed(2); // Increased range
-      close = (
-        parseFloat(low) +
-        Math.random() * (parseFloat(open) - parseFloat(low))
-      ).toFixed(2);
-    } else {
-      // Bullish scenario: close higher than open
-      low = (parseFloat(open) - Math.random() * (fluctuation * 7)).toFixed(2); // Increased range
-      high = (parseFloat(open) + Math.random() * (fluctuation * 7.5)).toFixed(
-        2
-      ); // Increased range
-      close = (
-        parseFloat(low) +
-        Math.random() * (parseFloat(high) - parseFloat(low))
-      ).toFixed(2);
-    }
-
-    console.log('========', open, high, low, close, isBearish);
+    const isBearish = Math.random() < 0.6; // 60% chance of bearish
+  
+    // Higher fluctuation: 8%–15% for realistic large candle heights
+    const bodyPercent = 0.05 + Math.random() * 0.1; // 5%–15% for body (open-close difference)
+    const wickPercent = 0.07 + Math.random() * 0.12; // 7%–19% for wick (high-low difference)
+  
+    const bodySize = +(basePrice * bodyPercent).toFixed(2);
+    const wickSize = +(basePrice * wickPercent).toFixed(2);
+  
+    // Open price with slight base fluctuation
+    const open = +(basePrice + (Math.random() - 0.5) * basePrice * 0.02).toFixed(2); // ±1% offset
+  
+    let close = isBearish
+      ? +(open - bodySize).toFixed(2)
+      : +(open + bodySize).toFixed(2);
+  
+    const high = +(Math.max(open, close) + wickSize).toFixed(2);
+    const low = +(Math.min(open, close) - wickSize).toFixed(2);
+  
     return { open, high, low, close, isBearish };
   }
+  
+  
 
   const handleCopy = (token) => {
     navigator.clipboard.writeText(token);
